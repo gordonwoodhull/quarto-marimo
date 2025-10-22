@@ -45,7 +45,7 @@ name = "quarto-marimo"
 platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
 
 [tool.pixi.tasks]
-lint = "ruff check && mypy _extensions/marimo/ && stylua -c _extensions/marimo/"
+lint = "ruff check && mypy lib/"
 serve = "quarto preview"
 render = "quarto render"
 ci = "quarto install tinytex --no-prompt && quarto render"
@@ -68,15 +68,15 @@ homepage = "https://github.com/marimo-team/quarto-marimo"
 installer = "uv"
 
 [tool.hatch.version]
-path = "_extensions/marimo/extract.py"
+path = "lib/extract.py"
 
 [tool.hatch.build.targets.sdist]
-include = ["/_extensions"]
-artifacts = ["_extensions"]
+include = ["/lib", "marimo-engine.ts"]
+artifacts = ["lib", "marimo-engine.ts"]
 
 [tool.hatch.build.targets.wheel]
-include = ["/_extensions"]
-artifacts = ["_extensions"]
+include = ["/lib", "marimo-engine.ts"]
+artifacts = ["lib", "marimo-engine.ts"]
 
 # Override the default uv version to use the latest version
 [tool.hatch.envs.hatch-uv]
