@@ -4,6 +4,9 @@ project:
   preview:
     port: 7777
 
+engines:
+  - url: file:///Users/gordon/src/quarto-marimo/marimo-engine.ts
+
 website:
   title: "marimo-quarto"
   page-navigation: true

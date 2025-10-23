@@ -9,8 +9,7 @@ pyproject: |
         "matplotlib",
         "marimo>=0.13.3"
     ]
-filters:
-  - marimo
+engine: marimo
 extract-media: _site/media
 ---
 

@@ -1,8 +1,7 @@
 ---
 title: marimo + quarto
 format: html
-filters:
-  - marimo
+engine: marimo
 ---
 
 # 🟢 🔵 🏝️

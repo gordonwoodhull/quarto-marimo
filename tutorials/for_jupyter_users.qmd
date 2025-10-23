@@ -3,8 +3,7 @@ title: marimo for Jupyter users
 marimo-version: 0.13.2
 header: |-
   # Copyright 2024 Marimo. All rights reserved.
-filters:
-- marimo-team/marimo
+engine: marimo
 ---
 
 # marimo for Jupyter users

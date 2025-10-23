@@ -1,8 +1,7 @@
 ---
 title: marimo tutorials
 format: html
-filters:
-  - marimo
+engine: marimo
 ---
 
 Open a tutorial.
