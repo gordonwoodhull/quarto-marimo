@@ -1,0 +1,27 @@
+*_files/
+script.py
+script.*
+*.html
+!example-pyscript-header.html
+.quarto/
+_output/
+_site/
+
+__pycache__
+
+/.quarto/
+
+*.aux
+*.log
+*.pdf
+*.tex
+
+
+*.AppImage
+result
+
+# pixi environments
+.pixi
+*.egg-info
+
+**/*.quarto_ipynb

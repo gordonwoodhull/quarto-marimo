@@ -1,0 +1,223 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "quarto-marimo"
+description = "marimo package for quarto"
+dynamic = ["version"]
+dependencies = [
+    # for marimo
+    "marimo>=0.14.8,<=0.14.16",
+    # quarto itself
+    "quarto",
+    # uv is used in the script calls
+    "uv",
+    # for cell formatting; if user version is not compatible, no-op
+    # so no lower bound needed
+    "ruff",
+    # for packaging.version; not sure what the lower bound is.
+    "packaging",
+    # for converting HTML to markdown in PDF output
+    "html2text",
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+classifiers = [
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: Apache Software License",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+name = "quarto-marimo"
+platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
+
+[tool.pixi.tasks]
+# todo: add typescript lint?
+lint = "ruff check && mypy _extensions/marimo/"
+serve = "quarto preview"
+render = "quarto render"
+ci = "quarto install tinytex --no-prompt && quarto render"
+refresh = "./scripts/export.sh"
+
+[tool.pixi.dependencies]
+marimo = ">=0.14.8,<=0.14.16"
+quarto = ">=1.6.43,<2"
+pandoc = ">=3.4,<4"
+pyyaml = ">=6.0.2,<7"
+stylua = ">=2.0.2,<3"
+uv = ">=0.6.14,<0.7"
+mypy = ">=1.15.0,<2"
+hatch = ">=1.14.1,<2"
+html2text = ">=2020.1.16"
+
+[project.urls]
+homepage = "https://github.com/marimo-team/quarto-marimo"
+
+[tool.hatch]
+installer = "uv"
+
+[tool.hatch.version]
+path = "_extensions/marimo/extract.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["/_extensions"]
+artifacts = ["_extensions"]
+
+[tool.hatch.build.targets.wheel]
+include = ["/_extensions"]
+artifacts = ["_extensions"]
+
+# Override the default uv version to use the latest version
+[tool.hatch.envs.hatch-uv]
+dependencies = ["uv>=0.4.17"]
+
+[tool.hatch.envs.default]
+features = ["dev"]
+python = "3.12"
+installer = "uv"
+dependencies = [
+    "uv>=0.4.17", # so we can bump the version used by hatch
+    # Typo checking
+    "typos~=1.23.6",
+]
+
+[tool.hatch.envs.default.scripts]
+lint = "ruff check --fix"
+lint-unsafe = "ruff check --fix --unsafe-fixes"
+format = "ruff format"
+
+[tool.ruff.lint]
+preview = true
+ignore = [
+    "G004",   # Logging statement uses f-string
+    "TC001", # Move application import into a type-checking block
+    "TC006", # Add quotes to type expression in typing.cast()
+    "D301",   # Use r""" if any backslashes in a docstring
+    "PERF203", # try-except within a loop incurs performance overhead; not always possible
+    "PERF401", # Use {message_str} to create a transformed list; at the cost of readability
+    "PERF403", # Use a dictionary comprehension instead of a for-loop; at the cost of readability
+    # TODO: we should fix these, and enable this rule
+    "PT011", # `pytest.raises(ValueError)` is too broad, set the `match` parameter or use a more specific exception
+    "E501",  # Line too long, we still trim
+    "D415", # First line should end with a period, question mark, or exclamation point
+    "FA102", # Use `from __future__ import annotations`
+    "UP007", # Use X | Y for type annotations, not supported in 3.9
+    "UP045", # Use X | None for optional type annotations, not supported in 3.9
+]
+extend-select = [
+    # pyflakes
+    "F",
+    # pycodestyle
+    "E",
+    # warning
+    "W",
+    # flake8 builtin-variable-shadowing
+    "A001",
+    # flake8 builtin-argument-shadowing
+    "A002",
+    # flake8-unused-arguments
+    "ARG",
+    # flake8-bugbear
+    "B",
+    # Performance
+    "PERF",
+    "ANN002", # missing-type-args
+    "ANN003", # missing-type-kwargs
+    "ANN201", # missing-return-type-undocumented-public-function
+    "ANN202", # missing-return-type-private-function
+    "ANN205", # missing-return-type-static-method
+    "ANN206", # missing-return-type-class-method
+    # isort
+    "I001",
+    # Enable entire ruff rule section
+    "ASYNC", # subset of flake8-async rules
+    "TCH",   # Rules around TYPE_CHECKING blocks
+    "G",     # flake8-logging-format rules
+    "LOG",   # flake8-logging rules, most of them autofixable
+    "PT",    # flake8-pytest-style rules
+    "TID25", # flake8-tidy-imports rules
+    # Per rule enables
+    # "RUF100", # Unused noqa (auto-fixable)
+    # We ignore more pydocstyle than we enable, so be more selective at what we enable
+    # "D101", # Missing docstring in public class
+    "D106",
+    # "D2",
+    "D3",
+    # "D400", # First line should end with a period
+    # "D401", # First line of docstring should be in imperative mood
+    "D402",
+    "D403",
+    "D412",
+    "D419",
+    "PGH004", # Use specific rule codes when using noqa
+    "PGH005", # Invalid unittest.mock.Mock methods/attributes/properties
+    # "S101", # Checks use `assert` outside the test cases, test cases should be added into the exclusions
+    "B004",   # Checks for use of hasattr(x, "__call__") and replaces it with callable(x)
+    "B006",   # Checks for uses of mutable objects as function argument defaults.
+    "B017",   # Checks for pytest.raises context managers that catch Exception or BaseException.
+    "B019",   # Use of functools.lru_cache or functools.cache on methods can lead to memory leaks
+    "TRY002", # Prohibit use of `raise Exception`, use specific exceptions instead.
+    "T201",   # No print statements
+    "D3",  # pydocstyle Quotes Issues
+    "D4",  # pydocstyle Docstring Content Issues
+    "D207",  # Docstring is under-indented
+    "D208",  # Docstring is over-indented
+    "D210",  # No whitespaces allowed surrounding docstring text
+    "D211",  # No blank lines allowed before class docstring
+    "D214",  # Section is over-indented
+    "D215",  # Section underline is over-indented
+    "UP",  # Upgrades
+]
+
+# Never try to fix `F401` (unused imports).
+unfixable = ["F401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"**/{tests}/*" = ["ANN201", "ANN202", "T201", "D", "F841"]
+"dagger/*" = ["TID252"]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
+combine-as-imports = true
+
+[tool.ruff.lint.flake8-type-checking]
+exempt-modules = ["typing", "typing_extensions"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint.flake8-tidy-imports]
+# Disallow all relative imports.
+ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-pytest-style]
+mark-parentheses = false
+fixture-parentheses = false
+
+[tool.mypy]
+strict = true
+warn_unused_ignores = false
+
+[tool.typos.default]
+extend-ignore-re = ["[0-9a-zA-Z]{43}"]
+
+[tool.black]
+line-length = 79

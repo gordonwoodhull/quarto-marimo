@@ -1,0 +1,14 @@
+name: CI
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: prefix-dev/setup-pixi@v0.8.8
+        with:
+          pixi-version: v0.40.2
+
+      - name: Lint
+        run: pixi run lint
