@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-99.9.9">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>marimo + quarto – marimo-quarto</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -68,15 +71,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="./tutorials/index.html" rel="next">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-3aa970819e70fbc78806154e5a1fcd28.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-bacab002eaade4be31bc372f9c9ff431.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-f71af606184998ad3169bac37cf83bad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -104,16 +106,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@marimo-team/islands@0.14.8/dist/main.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/@marimo-team/islands@0.14.8/dist/style.css" rel="stylesheet" crossorigin="anonymous">
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "import marimo\n\n__generated_with = \"0.23.1\"\napp = marimo.App()\n\n\n@app.cell\ndef _(mo):\n    slider = mo.ui.slider(start=1, stop=10)\n    slider\n    return (slider,)\n\n\n@app.cell\ndef _(mo, slider):\n    mo.md(f'''\n      # Hello from marimo!{'!' * slider.value}\n\n      This is a raw, reactive python cell.\n      You can edit it, and the output will change on run.\n    ''').callout(\"info\")\n    return\n\n\n@app.cell\ndef _():\n    print(\"remember that stdout is not shown\")\n    result = \"Only outputs!\"\n    result,\n    return\n\n\n@app.cell\ndef _():\n    editor_result = \"Change me\" + (\"!\" * 3)\n    editor_result,\n    return (editor_result,)\n\n\n@app.cell\ndef _(editor_result, mo):\n    mo.md(\n      f\"The value of `editor_result` in the previous cell: **{editor_result}**\")\n    return\n\n\n@app.cell\ndef _():\n    # Bug: Cells are not runnable if no output\n    import marimo as mo\n\n    return (mo,)\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script><meta property="og:title" content="marimo + quarto – marimo-quarto">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="marimo-quarto">
+</head><body class="nav-sidebar docked quarto-light"><marimo-code hidden="">import%20marimo%0A%0A__generated_with%20%3D%20%220.23.1%22%0Aapp%20%3D%20marimo.App%28%29%0A%0A%0A%40app.cell%0Adef%20_%28mo%29%3A%0A%20%20%20%20slider%20%3D%20mo.ui.slider%28start%3D1%2C%20stop%3D10%29%0A%20%20%20%20slider%0A%20%20%20%20return%20%28slider%2C%29%0A%0A%0A%40app.cell%0Adef%20_%28mo%2C%20slider%29%3A%0A%20%20%20%20mo.md%28f%27%27%27%0A%20%20%20%20%20%20%23%20Hello%20from%20marimo%21%7B%27%21%27%20%2A%20slider.value%7D%0A%0A%20%20%20%20%20%20This%20is%20a%20raw%2C%20reactive%20python%20cell.%0A%20%20%20%20%20%20You%20can%20edit%20it%2C%20and%20the%20output%20will%20change%20on%20run.%0A%20%20%20%20%27%27%27%29.callout%28%22info%22%29%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_%28%29%3A%0A%20%20%20%20print%28%22remember%20that%20stdout%20is%20not%20shown%22%29%0A%20%20%20%20result%20%3D%20%22Only%20outputs%21%22%0A%20%20%20%20result%2C%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_%28%29%3A%0A%20%20%20%20editor_result%20%3D%20%22Change%20me%22%20%2B%20%28%22%21%22%20%2A%203%29%0A%20%20%20%20editor_result%2C%0A%20%20%20%20return%20%28editor_result%2C%29%0A%0A%0A%40app.cell%0Adef%20_%28editor_result%2C%20mo%29%3A%0A%20%20%20%20mo.md%28%0A%20%20%20%20%20%20f%22The%20value%20of%20%60editor_result%60%20in%20the%20previous%20cell%3A%20%2A%2A%7Beditor_result%7D%2A%2A%22%29%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_%28%29%3A%0A%20%20%20%20%23%20Bug%3A%20Cells%20are%20not%20runnable%20if%20no%20output%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20return%20%28mo%2C%29%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run%28%29%0A</marimo-code><script type="module" src="https://cdn.jsdelivr.net/npm/@marimo-team/islands@0.23.1/dist/main.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/@marimo-team/islands@0.23.1/dist/style.css" rel="stylesheet" title="marimo-islands" crossorigin="anonymous">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&amp;family=Lora&amp;family=PT+Sans:wght@400;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" integrity="sha384-wcIxkf4k558AjM3Yz3BBFQUbk/zgIYC2R0QpeeYb+TwlBVMrlgLqwRjRtGZiK7ww" crossorigin="anonymous">
-<meta property="og:title" content="marimo + quarto – marimo-quarto">
-<meta property="og:description" content="">
-<meta property="og:site_name" content="marimo-quarto">
-</head><body class="nav-sidebar docked quarto-light"><marimo-filename hidden=""></marimo-filename>
+<marimo-filename hidden=""></marimo-filename>
 
 
 
@@ -182,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./tutorials/ui.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ui</span></a>
+ <span class="menu-text">UI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -207,6 +218,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="./tutorials/fileformat.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Fileformat</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/sql.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SQL</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/external_dependencies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">External dependencies</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -279,7 +302,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This repository provides a framework for integrating <a href="https://quarto.org"><code>Quarto</code></a> with <a href="https://marimo.io"><code>marimo</code></a>, enabling markdown documents to be executed in a <code>marimo</code> environment, and reactive in page.</p>
 <marimo-island data-app-id="main" data-cell-id="Hbol" data-reactive="true">
     <marimo-cell-output>
-    <marimo-ui-element object-id="Hbol-0" random-id="01f37f4f-9567-49b1-60c9-4b21011feb98"><marimo-slider data-initial-value="1" data-label="null" data-start="1" data-stop="10" data-steps="[]" data-debounce="false" data-disabled="false" data-orientation="&quot;horizontal&quot;" data-show-value="false" data-include-input="false" data-full-width="false"></marimo-slider></marimo-ui-element>
+    <marimo-ui-element object-id="Hbol-0" random-id="d6a6a871-1c16-ebda-dc3b-2b0ad8c68ac8"><marimo-slider data-initial-value="1" data-label="null" data-start="1" data-stop="10" data-steps="[]" data-debounce="false" data-disabled="false" data-orientation="&quot;horizontal&quot;" data-show-value="false" data-include-input="false" data-full-width="false"></marimo-slider></marimo-ui-element>
     </marimo-cell-output>
     <marimo-cell-code hidden="">slider%20%3D%20mo.ui.slider(start%3D1%2C%20stop%3D10)%0Aslider</marimo-cell-code>
 </marimo-island>
@@ -291,9 +314,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ss">'''</span>).callout(<span class="st">"info"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <marimo-island data-app-id="main" data-cell-id="MJUe" data-reactive="true">
     <marimo-cell-output>
-    <marimo-callout-output data-html="&quot;<span class=\&quot;markdown prose dark:prose-invert\&quot;><h1 id=\&quot;hello-from-marimo\&quot;>Hello from marimo!!</h1>\n<span class=\&quot;paragraph\&quot;>This is a raw, reactive python cell.\nYou can edit it, and the output will change on run.</span></span>&quot;" data-kind="&quot;info&quot;"></marimo-callout-output>
+    <marimo-callout-output data-html="&quot;<span class=\&quot;markdown prose dark:prose-invert contents\&quot;><h1 id=\&quot;hello-from-marimo\&quot;>Hello from marimo!!</h1>\n<span class=\&quot;paragraph\&quot;>This is a raw, reactive python cell.\nYou can edit it, and the output will change on run.</span></span>&quot;" data-kind="&quot;info&quot;"></marimo-callout-output>
     </marimo-cell-output>
-    <marimo-ui-element object-id="7568a409-8dbd-4500-1cc2-97585feb527e" random-id="7568a409-8dbd-4500-1cc2-97585feb527e"><marimo-code-editor data-initial-value="&quot;mo.md(f'''\n  # Hello from marimo!{'!' * slider.value}\n\n  This is a raw, reactive python cell.\n  You can edit it, and the output will change on run.\n''').callout(\&quot;info\&quot;)&quot;" data-label="null" data-language="&quot;python&quot;" data-placeholder="&quot;&quot;" data-disabled="false" data-show-copy-button="true" data-debounce="false"></marimo-code-editor></marimo-ui-element>
+    <marimo-ui-element object-id="421bf666-2d35-2d49-bbb8-731e52cfdf06" random-id="421bf666-2d35-2d49-bbb8-731e52cfdf06"><marimo-code-editor data-initial-value="&quot;mo.md(f'''\n  # Hello from marimo!{'!' * slider.value}\n\n  This is a raw, reactive python cell.\n  You can edit it, and the output will change on run.\n''').callout(\&quot;info\&quot;)&quot;" data-label="null" data-language="&quot;python&quot;" data-placeholder="&quot;&quot;" data-disabled="false" data-show-copy-button="true" data-debounce="false"></marimo-code-editor></marimo-ui-element>
 </marimo-island>
 <section id="what" class="level2">
 <h2 class="anchored" data-anchor-id="what">What?</h2>
@@ -306,7 +329,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
 <p>Write a <code>qmd</code> document with <code>{marimo}</code> cells.</p>
 <p>For instance the following cell</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>```python {.marimo}</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>```{python .marimo}</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"remember that stdout is not shown"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="st">"Only outputs!"</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>result,</span>
@@ -320,7 +343,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </marimo-island>
 <hr>
 <p>We can make it editable:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>```python {.marimo}</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>```{python .marimo}</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| editor: true</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>editor_result <span class="op">=</span> <span class="st">"Change me"</span> <span class="op">+</span> (<span class="st">"!"</span> <span class="op">*</span> <span class="dv">3</span>)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>editor_result,</span>
@@ -331,13 +354,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <marimo-cell-output>
     <marimo-json-output data-json-data="[&quot;Change me!!!&quot;]" data-value-types="&quot;python&quot;"></marimo-json-output>
     </marimo-cell-output>
-    <marimo-ui-element object-id="520b2c48-0cc7-097d-0c63-e41160bdf67a" random-id="520b2c48-0cc7-097d-0c63-e41160bdf67a"><marimo-code-editor data-initial-value="&quot;editor_result = \&quot;Change me\&quot; + (\&quot;!\&quot; * 3)\neditor_result,&quot;" data-label="null" data-language="&quot;python&quot;" data-placeholder="&quot;&quot;" data-disabled="false" data-show-copy-button="true" data-debounce="false"></marimo-code-editor></marimo-ui-element>
+    <marimo-ui-element object-id="5eba8910-00d2-0930-75e7-19cea298da93" random-id="5eba8910-00d2-0930-75e7-19cea298da93"><marimo-code-editor data-initial-value="&quot;editor_result = \&quot;Change me\&quot; + (\&quot;!\&quot; * 3)\neditor_result,&quot;" data-label="null" data-language="&quot;python&quot;" data-placeholder="&quot;&quot;" data-disabled="false" data-show-copy-button="true" data-debounce="false"></marimo-code-editor></marimo-ui-element>
 </marimo-island>
 <p>but the default is to show the output only.</p>
 <hr>
 <marimo-island data-app-id="main" data-cell-id="lEQa" data-reactive="true">
     <marimo-cell-output>
-    <span class="markdown prose dark:prose-invert"><span class="paragraph">The value of <code>editor_result</code> in the previous cell: <strong>Change me!!!</strong></span></span>
+    <marimo-mime-renderer data-mime="&quot;text/markdown&quot;" data-data="&quot;<span class=\&quot;markdown prose dark:prose-invert contents\&quot;><span class=\&quot;paragraph\&quot;>The value of <code>editor_result</code> in the previous cell: <strong>Change me!!!</strong></span></span>&quot;"></marimo-mime-renderer>
     </marimo-cell-output>
     <marimo-cell-code hidden="">mo.md(%0A%20%20f%22The%20value%20of%20%60editor_result%60%20in%20the%20previous%20cell%3A%20**%7Beditor_result%7D**%22)</marimo-cell-code>
 </marimo-island>
@@ -357,7 +380,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <marimo-cell-output>
     <span></span>
     </marimo-cell-output>
-    <marimo-ui-element object-id="13aa8d1f-8f69-3fc6-969d-3ac8a19df212" random-id="13aa8d1f-8f69-3fc6-969d-3ac8a19df212"><marimo-code-editor data-initial-value="&quot;# Bug: Cells are not runnable if no output\nimport marimo as mo&quot;" data-label="null" data-language="&quot;python&quot;" data-placeholder="&quot;&quot;" data-disabled="false" data-show-copy-button="true" data-debounce="false"></marimo-code-editor></marimo-ui-element>
+    <marimo-ui-element object-id="f39cbcfa-de37-ee53-2839-387a7cb95887" random-id="f39cbcfa-de37-ee53-2839-387a7cb95887"><marimo-code-editor data-initial-value="&quot;# Bug: Cells are not runnable if no output\nimport marimo as mo&quot;" data-label="null" data-language="&quot;python&quot;" data-placeholder="&quot;&quot;" data-disabled="false" data-show-copy-button="true" data-debounce="false"></marimo-code-editor></marimo-ui-element>
 </marimo-island>
 
 
@@ -491,7 +514,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/gordonwoodhull\.github\.io\/quarto-marimo\/");
+        var filterRegex = new RegExp('/' + window.location.host + '/');
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
@@ -830,117 +853,116 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> marimo + quarto</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> marimo</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu"># 🟢 🔵 🏝️</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu"># 🟢 🔵 🏝️</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>This repository provides a framework for integrating</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`Quarto`</span><span class="co">](https://quarto.org)</span> with <span class="co">[</span><span class="ot">`marimo`</span><span class="co">](https://marimo.io)</span>,</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>enabling markdown documents to be executed in a <span class="in">`marimo`</span> environment, and</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>reactive in page.</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="in">```python {.marimo}</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>slider <span class="op">=</span> mo.ui.slider(start<span class="op">=</span><span class="dv">1</span>, stop<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>slider</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="in">```python {.marimo}</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>mo.md(<span class="ss">f'''</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="ss">  # Hello from marimo!</span><span class="sc">{</span><span class="st">'!'</span> <span class="op">*</span> slider<span class="sc">.</span>value<span class="sc">}</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="ss">  This is a raw, reactive python cell.</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="ss">  You can edit it, and the output will change on run.</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="ss">'''</span>).callout(<span class="st">"info"</span>)</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## What?</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>First, aquaint yourself with the <span class="co">[</span><span class="ot">`marimo`</span><span class="co">](https://marimo.io)</span>! One you've</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>digested the basics, and maybe [even written a few <span class="in">`marimo`</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>notebooks](https://marimo.app), start to consider the possibilities of exporting</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="in">`marimo`</span> cells to be standalone, Web Assembly modules, embeddable anywhere.</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>That's where Quarto comes in with the <span class="in">`qmd`</span> format.</span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="in">`qmd`</span> is a markdown format that allows for the extraction and execution of code</span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>cells in a markdown document. It's a great way to maintain readable documents</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>exportable to a variety of formats, while still being able to execute code.</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>This page, and the <span class="in">`marimo`</span> tutorials in the sidebar are <span class="in">`qmd`</span> documents, to get</span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>a sense of what's possible,</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">look at their source</span><span class="co">]</span>(javascript:document.getElementById("quarto-code-tools-source").click()).</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Getting started</span></span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>Write a <span class="in">`qmd`</span> document with <span class="in">`{marimo}`</span> cells.</span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>For instance the following cell</span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="in">````python</span></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>```python {.marimo}</span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"remember that stdout is not shown"</span>)</span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="st">"Only outputs!"</span></span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>result,</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="in">````</span></span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>produces the following output:</span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="in">```python {.marimo}</span></span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"remember that stdout is not shown"</span>)</span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="st">"Only outputs!"</span></span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>result,</span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>We can make it editable:</span>
-<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a><span class="in">````python</span></span>
-<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>```python {.marimo}</span>
-<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| editor: true</span></span>
-<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>editor_result <span class="op">=</span> <span class="st">"Change me"</span> <span class="op">+</span> (<span class="st">"!"</span> <span class="op">*</span> <span class="dv">3</span>)</span>
-<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>editor_result,</span>
-<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a><span class="in">````</span></span>
-<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a><span class="in">```python {.marimo}</span></span>
-<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>editor_result <span class="op">=</span> <span class="st">"Change me"</span> <span class="op">+</span> (<span class="st">"!"</span> <span class="op">*</span> <span class="dv">3</span>)</span>
-<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>editor_result,</span>
-<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>but the default is to show the output only.</span>
-<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a><span class="in">```python {.marimo}</span></span>
-<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>mo.md(</span>
-<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>  <span class="ss">f"The value of `editor_result` in the previous cell: **</span><span class="sc">{</span>editor_result<span class="sc">}</span><span class="ss">**"</span>)</span>
-<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>Hold <span class="in">`ctrl`</span> to manually run a stale cell.</span>
-<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a><span class="fu">### but how do I run this?</span></span>
-<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>Install quarto and <span class="in">`quarto install extension marimo-team/quarto-marimo`</span>.</span>
-<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>You can also export existing notebooks into quarto format: <span class="in">`marimo export md mynotebook.py -o mynotebook.qmd`</span></span>
-<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a><span class="fu">## Background cells shown for illustration</span></span>
-<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a><span class="in">```python {.marimo}</span></span>
-<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a><span class="co"># Bug: Cells are not runnable if no output</span></span>
-<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> marimo <span class="im">as</span> mo</span>
-<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>This repository provides a framework for integrating</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`Quarto`</span><span class="co">](https://quarto.org)</span> with <span class="co">[</span><span class="ot">`marimo`</span><span class="co">](https://marimo.io)</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>enabling markdown documents to be executed in a <span class="in">`marimo`</span> environment, and</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>reactive in page.</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="in">```{python .marimo}</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>slider <span class="op">=</span> mo.ui.slider(start<span class="op">=</span><span class="dv">1</span>, stop<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>slider</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{python .marimo}</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>mo.md(<span class="ss">f'''</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="ss">  # Hello from marimo!</span><span class="sc">{</span><span class="st">'!'</span> <span class="op">*</span> slider<span class="sc">.</span>value<span class="sc">}</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="ss">  This is a raw, reactive python cell.</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="ss">  You can edit it, and the output will change on run.</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="ss">'''</span>).callout(<span class="st">"info"</span>)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="fu">## What?</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>First, aquaint yourself with the <span class="co">[</span><span class="ot">`marimo`</span><span class="co">](https://marimo.io)</span>! One you've</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>digested the basics, and maybe [even written a few <span class="in">`marimo`</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>notebooks](https://marimo.app), start to consider the possibilities of exporting</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="in">`marimo`</span> cells to be standalone, Web Assembly modules, embeddable anywhere.</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>That's where Quarto comes in with the <span class="in">`qmd`</span> format.</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="in">`qmd`</span> is a markdown format that allows for the extraction and execution of code</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>cells in a markdown document. It's a great way to maintain readable documents</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>exportable to a variety of formats, while still being able to execute code.</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>This page, and the <span class="in">`marimo`</span> tutorials in the sidebar are <span class="in">`qmd`</span> documents, to get</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>a sense of what's possible,</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">look at their source</span><span class="co">]</span>(javascript:document.getElementById("quarto-code-tools-source").click()).</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="fu">## Getting started</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>Write a <span class="in">`qmd`</span> document with <span class="in">`{marimo}`</span> cells.</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>For instance the following cell</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="in">````python</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>```{python .marimo}</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"remember that stdout is not shown"</span>)</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="st">"Only outputs!"</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>result,</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="in">````</span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>produces the following output:</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{python .marimo}</span></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"remember that stdout is not shown"</span>)</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="st">"Only outputs!"</span></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>result,</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>We can make it editable:</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a><span class="in">````python</span></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>```{python .marimo}</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| editor: true</span></span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>editor_result <span class="op">=</span> <span class="st">"Change me"</span> <span class="op">+</span> (<span class="st">"!"</span> <span class="op">*</span> <span class="dv">3</span>)</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>editor_result,</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a><span class="in">````</span></span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a><span class="in">```{python .marimo}</span></span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>editor_result <span class="op">=</span> <span class="st">"Change me"</span> <span class="op">+</span> (<span class="st">"!"</span> <span class="op">*</span> <span class="dv">3</span>)</span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>editor_result,</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>but the default is to show the output only.</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a><span class="in">```{python .marimo}</span></span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>mo.md(</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>  <span class="ss">f"The value of `editor_result` in the previous cell: **</span><span class="sc">{</span>editor_result<span class="sc">}</span><span class="ss">**"</span>)</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>Hold <span class="in">`ctrl`</span> to manually run a stale cell.</span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a><span class="fu">### but how do I run this?</span></span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>Install quarto and <span class="in">`quarto install extension marimo-team/quarto-marimo`</span>.</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>You can also export existing notebooks into quarto format: <span class="in">`marimo export md mynotebook.py -o mynotebook.qmd`</span></span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a><span class="fu">## Background cells shown for illustration</span></span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a><span class="in">```{python .marimo}</span></span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a><span class="co"># Bug: Cells are not runnable if no output</span></span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> marimo <span class="im">as</span> mo</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
