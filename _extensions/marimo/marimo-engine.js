@@ -1,11 +1,14 @@
 import { mkdir, mkdtemp, rename, rm, readFile, stat, writeFile } from "node:fs/promises";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const extensionUrl = new URL(".", import.meta.url);
 const version = await extensionVersion();
-const releaseUrl = new URL(
-  `https://github.com/marimo-team/quarto-marimo/releases/download/v${version}/`,
-);
+// Fork only: artifacts come from the fork's releases (or from the directory
+// URL in QUARTO_MARIMO_RELEASE_URL, for testing before a release exists).
+const releaseBase = process.env.QUARTO_MARIMO_RELEASE_URL ??
+  `https://github.com/gordonwoodhull/quarto-marimo/releases/download/v${version}/`;
+const releaseUrl = new URL(releaseBase.endsWith("/") ? releaseBase : `${releaseBase}/`);
 const engineName = `marimo-engine-v${version}.js`;
 
 const artifacts = [
