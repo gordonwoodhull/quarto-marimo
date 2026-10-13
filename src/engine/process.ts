@@ -1,4 +1,9 @@
-import { dirname, fromFileUrl, join } from "path";
+import { spawn } from "node:child_process";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import process from "node:process";
+import { fileURLToPath } from "node:url";
 
 import type { QuartoAPI } from "@quarto/types";
 import {
@@ -8,7 +13,7 @@ import {
 
 const defaultCompilerTimeoutMs = 300_000;
 
-// Deno exchanges UTF-8 bytes on stdin and stdout, but Python decodes and
+// The host exchanges UTF-8 bytes on stdin and stdout, but Python decodes and
 // encodes those streams with the host locale unless UTF-8 mode is on. Windows
 // locales such as cp932 otherwise turn document text into mojibake and lone
 // surrogates that later fail JSON encoding.
@@ -39,16 +44,17 @@ export async function runMarimoCompiler(
     globalEval: boolean;
     externalEnv: boolean;
     pyproject: string;
+    bareSql?: boolean;
   },
 ): Promise<MarimoExecution> {
-  const extensionDir = dirname(fromFileUrl(options.moduleUrl));
+  const extensionDir = dirname(fileURLToPath(options.moduleUrl));
   const extractPath = join(extensionDir, "python", "extract.py");
   let command: string;
   let args: string[];
   let temporaryDirectory: string | undefined;
 
   if (options.externalEnv) {
-    command = Deno.env.get("QUARTO_PYTHON") || "python";
+    command = process.env.QUARTO_PYTHON || "python";
     args = [extractPath];
   } else {
     command = "uv";
@@ -65,13 +71,16 @@ export async function runMarimoCompiler(
     options.interactive ? "html" : "static",
     options.globalEval ? "yes" : "no",
   );
+  // Only Quarto 2 resolves bare `{sql}` ownership; the flag is appended last
+  // so the argument list is unchanged for hosts that never set it.
+  if (options.bareSql) args.push("yes");
 
   let output: string;
   try {
     output = await executeProcess(quarto, command, args, options.source);
   } finally {
     if (temporaryDirectory) {
-      await removeTemporaryDirectory(temporaryDirectory);
+      removeTemporaryDirectory(temporaryDirectory);
     }
   }
   const value: unknown = JSON.parse(output);
@@ -85,9 +94,7 @@ async function constructUvCommand(
   pyproject: string,
 ): Promise<{ args: string[]; temporaryDirectory: string }> {
   const commandPath = join(extensionDir, "python", "command.py");
-  const temporaryDirectory = await Deno.makeTempDir({
-    prefix: "quarto-marimo-",
-  });
+  const temporaryDirectory = mkdtempSync(join(tmpdir(), "quarto-marimo-"));
   try {
     const output = await executeProcess(
       quarto,
@@ -112,12 +119,12 @@ async function constructUvCommand(
     }
     return { args: value, temporaryDirectory };
   } catch (error: unknown) {
-    await removeTemporaryDirectory(temporaryDirectory);
+    removeTemporaryDirectory(temporaryDirectory);
     throw error;
   }
 }
 
-export async function executeProcess(
+export function executeProcess(
   quarto: QuartoAPI,
   command: string,
   args: string[],
@@ -125,52 +132,59 @@ export async function executeProcess(
   timeoutMs = compilerTimeoutMs(),
   env?: Record<string, string>,
 ): Promise<string> {
-  const child = new Deno.Command(command, {
-    args,
-    env: { ...pythonUtf8Environment, ...env },
-    stdin: "piped",
-    stdout: "piped",
-    stderr: "piped",
-  }).spawn();
-  const outputPromise = child.output();
-  const writer = child.stdin.getWriter();
-  let timedOut = false;
-  const timeout = setTimeout(() => {
-    timedOut = true;
-    try {
+  return new Promise((resolve, reject) => {
+    // Node replaces the child environment where Deno merges it, so merge
+    // explicitly to behave the same under both runtimes.
+    const child = spawn(command, args, {
+      env: { ...process.env, ...pythonUtf8Environment, ...env },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    const stdout: Buffer[] = [];
+    const stderr: Buffer[] = [];
+    let timedOut = false;
+    let settled = false;
+    const timeout = setTimeout(() => {
+      timedOut = true;
       child.kill("SIGTERM");
-    } catch {
-      // The process exited between the timeout and signal delivery.
-    }
-  }, timeoutMs);
+    }, timeoutMs);
+    const settle = (action: () => void) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      action();
+    };
 
-  let output: Deno.CommandOutput;
-  try {
-    await writer.write(new TextEncoder().encode(stdin));
-    await writer.close();
-    output = await outputPromise;
-  } catch (error: unknown) {
-    if (!timedOut) throw error;
-    await outputPromise.catch(() => undefined);
-    throw timeoutError(command, args, timeoutMs);
-  } finally {
-    clearTimeout(timeout);
-  }
-  if (timedOut) throw timeoutError(command, args, timeoutMs);
-  const stderr = new TextDecoder().decode(output.stderr);
-  if (stderr) quarto.console.info(stderr.trim());
-  if (!output.success) {
-    throw new Error(
-      stderr.trim() || `${command} exited with code ${output.code}`,
-    );
-  }
-  return new TextDecoder().decode(output.stdout);
+    child.stdout.on("data", (chunk: Buffer) => stdout.push(chunk));
+    child.stderr.on("data", (chunk: Buffer) => stderr.push(chunk));
+    // The child may exit before reading all of stdin (EPIPE); the exit status
+    // below reports the real failure.
+    child.stdin.on("error", () => {});
+    child.on("error", (error) => settle(() => reject(error)));
+    child.on("close", (code) => {
+      settle(() => {
+        if (timedOut) {
+          reject(timeoutError(command, args, timeoutMs));
+          return;
+        }
+        const errorText = Buffer.concat(stderr).toString("utf-8");
+        if (errorText) quarto.console.info(errorText.trim());
+        if (code !== 0) {
+          reject(
+            new Error(
+              errorText.trim() || `${command} exited with code ${code}`,
+            ),
+          );
+          return;
+        }
+        resolve(Buffer.concat(stdout).toString("utf-8"));
+      });
+    });
+    child.stdin.end(stdin, "utf-8");
+  });
 }
 
 function compilerTimeoutMs(): number {
-  const seconds = Number(
-    Deno.env.get("QUARTO_MARIMO_TIMEOUT_SECONDS") ?? "",
-  );
+  const seconds = Number(process.env.QUARTO_MARIMO_TIMEOUT_SECONDS ?? "");
   return Number.isFinite(seconds) && seconds > 0
     ? seconds * 1000
     : defaultCompilerTimeoutMs;
@@ -188,8 +202,8 @@ function timeoutError(
   );
 }
 
-async function removeTemporaryDirectory(path: string): Promise<void> {
-  await Deno.remove(path, { recursive: true }).catch(() => undefined);
+function removeTemporaryDirectory(path: string): void {
+  rmSync(path, { recursive: true, force: true });
 }
 
 function isPageExecution(

@@ -34,6 +34,7 @@ def convert_markdown(
     filename: str,
     interactive: bool,
     global_eval: bool = True,
+    bare_sql: bool = False,
 ) -> dict[str, Any]:
     callback = (
         interactive_export(filename=filename, global_eval=global_eval)
@@ -47,7 +48,7 @@ def convert_markdown(
         }
 
     parser = QuartoMarimoParser(output_format="quarto-marimo")  # type: ignore[arg-type]
-    return cast(ConversionResult, parser.convert(normalize_markdown(text)))
+    return cast(ConversionResult, parser.convert(normalize_markdown(text, bare_sql)))
 
 
 def interactive_export(
@@ -104,10 +105,13 @@ def static_export(
 
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
-    if len(args) not in (2, 3):
-        raise ValueError("expected reference file, output mode, and optional eval mode")
+    if len(args) not in (2, 3, 4):
+        raise ValueError(
+            "expected reference file, output mode, and optional eval and bare-sql modes"
+        )
     reference_file, output_mode = args[:2]
-    global_eval = args[2].lower() == "yes" if len(args) == 3 else True
+    global_eval = args[2].lower() == "yes" if len(args) >= 3 else True
+    bare_sql = args[3].lower() == "yes" if len(args) >= 4 else False
     interactive = output_mode.lower() == "html"
     os.environ["MARIMO_NO_JS"] = str(not interactive).lower()
 
@@ -122,6 +126,7 @@ def main(argv: list[str] | None = None) -> int:
             filename=reference_file,
             interactive=interactive,
             global_eval=global_eval,
+            bare_sql=bare_sql,
         )
     sys.stdout.buffer.write(json.dumps(result).encode("utf-8"))
     sys.stdout.flush()

@@ -1,4 +1,6 @@
-import { dirname, fromFileUrl } from "path";
+import { readFileSync } from "node:fs";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type {
   CheckConfiguration,
@@ -10,6 +12,7 @@ import type {
   ExecutionEngineDiscovery,
   ExecutionEngineInstance,
   ExecutionTarget,
+  LanguageClaim,
   MappedString,
   PandocIncludes,
   PostProcessOptions,
@@ -17,9 +20,10 @@ import type {
 } from "@quarto/types";
 
 import {
+  cellOwnedByMarimo,
   containsMarimoFence,
-  isMarimoCell,
   MARIMO_CELL_REGEX,
+  MARIMO_CELL_REGEX_WITH_BARE_SQL,
 } from "./authoring.ts";
 import { writeBrowserHeader } from "./browser-assets.ts";
 import {
@@ -48,16 +52,23 @@ const marimoEngineDiscovery: ExecutionEngineDiscovery = {
   ],
   validExtensions: () => [".qmd", ".md"],
 
+  // Quarto 1 only: Quarto 2 reads the static `claims-files: []` from
+  // `_extension.yml` and never calls this, because it selects marimo by
+  // language claim. Quarto 1 needs the sniff to detect documents that use the
+  // legacy `python {.marimo}` fence, which its language detection misses.
   claimsFile: (file: string, extension: string) => {
     if (![".qmd", ".md"].includes(extension.toLowerCase())) return false;
     try {
-      return containsMarimoFence(Deno.readTextFileSync(file));
+      return containsMarimoFence(readFileSync(file, "utf-8"));
     } catch {
       return false;
     }
   },
 
-  claimsLanguage: (language: string, firstClass?: string): boolean | number => {
+  claimsLanguage: (
+    language: string,
+    firstClass?: string,
+  ): boolean | number | LanguageClaim => {
     if (
       (language === "python" || language === "sql" ||
         language === "markdown") &&
@@ -73,6 +84,10 @@ const marimoEngineDiscovery: ExecutionEngineDiscovery = {
     ) {
       return 1;
     }
+    // Bare `{sql}` rides along as interop when marimo is already present via
+    // a primary claim elsewhere in the document (Quarto 2 only; Quarto 1
+    // ignores object-valued claims). Bare `{python}` stays unclaimed.
+    if (language === "sql") return { kind: "interop" };
     return false;
   },
 
@@ -138,11 +153,15 @@ const marimoEngineDiscovery: ExecutionEngineDiscovery = {
 
     partitionedMarkdown: (file: string) =>
       Promise.resolve(
-        quarto.markdownRegex.partition(Deno.readTextFileSync(file)),
+        quarto.markdownRegex.partition(readFileSync(file, "utf-8")),
       ),
 
     execute: async (options: ExecuteOptions): Promise<ExecuteResult> => {
       const interactive = quarto.format.isHtmlCompatible(options.format);
+      // Quarto 2's `handledLanguages` is the leave-alone set, so marimo owns
+      // bare sql exactly when "sql" is absent from it. Quarto 1 omits it.
+      const bareSql = options.handledLanguages !== undefined &&
+        !options.handledLanguages.includes("sql");
       const execution = await quarto.console.withSpinner(
         { message: "Executing marimo cells..." },
         async () =>
@@ -154,15 +173,18 @@ const marimoEngineDiscovery: ExecutionEngineDiscovery = {
             globalEval: options.target.metadata.eval !== false,
             externalEnv: options.target.metadata["external-env"] === true,
             pyproject: String(options.target.metadata.pyproject ?? ""),
+            bareSql,
           }),
       );
       const chunks = await quarto.markdownRegex.breakQuartoMd(
         options.target.markdown,
         false,
         false,
-        MARIMO_CELL_REGEX,
+        bareSql ? MARIMO_CELL_REGEX_WITH_BARE_SQL : MARIMO_CELL_REGEX,
       );
-      const marimoCells = chunks.cells.filter(isMarimoCell);
+      const marimoCells = chunks.cells.filter((cell) =>
+        cellOwnedByMarimo(cell, options.handledLanguages)
+      );
       const projected = execution.kind === "page"
         ? projectInteractivePage(execution.page)
         : await projectStaticPage(execution.outputs, htmlToMarkdown);
@@ -171,14 +193,14 @@ const marimoEngineDiscovery: ExecutionEngineDiscovery = {
       let index = 0;
       const markdown = chunks.cells
         .map((cell) =>
-          isMarimoCell(cell)
+          cellOwnedByMarimo(cell, options.handledLanguages)
             ? projected[index++] ?? ""
             : cell.sourceVerbatim.value
         )
         .join("");
       const includes: PandocIncludes = {};
       if (execution.kind === "page") {
-        const extensionDir = dirname(fromFileUrl(import.meta.url));
+        const extensionDir = dirname(fileURLToPath(import.meta.url));
         includes["include-in-header"] = [
           writeBrowserHeader(extensionDir, options.tempDir),
         ];

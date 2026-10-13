@@ -1,59 +1,93 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import process from "node:process";
+import { test } from "node:test";
 
 import type { QuartoAPI } from "@quarto/types";
 
+import { assertEquals, assertRejects } from "../assert.ts";
 import { executeProcess, runMarimoCompiler } from "../../src/engine/process.ts";
 
-Deno.test({
-  name: "external environments use QUARTO_PYTHON",
-  ignore: Deno.build.os === "windows",
-  async fn() {
-    const command = await Deno.makeTempFile();
-    const previous = Deno.env.get("QUARTO_PYTHON");
+const windows = process.platform === "win32";
+const quarto = { console: { info: () => {} } } as unknown as QuartoAPI;
+
+function withScript(body: string, run: (command: string) => Promise<void>) {
+  return async () => {
+    const directory = mkdtempSync(join(tmpdir(), "quarto-marimo-test-"));
+    const command = join(directory, "script.sh");
     try {
-      await Deno.writeTextFile(
-        command,
-        '#!/bin/sh\nprintf \'%s\\n\' \'{"kind":"static","outputs":[]}\'\n',
-      );
-      await Deno.chmod(command, 0o755);
-      Deno.env.set("QUARTO_PYTHON", command);
-
-      const quarto = {
-        console: { info: () => {} },
-      } as unknown as QuartoAPI;
-      const result = await runMarimoCompiler(quarto, {
-        moduleUrl: import.meta.url,
-        source: "",
-        input: "page.qmd",
-        interactive: false,
-        globalEval: true,
-        externalEnv: true,
-        pyproject: "",
-      });
-
-      assertEquals(result, { kind: "static", outputs: [] });
+      writeFileSync(command, body);
+      chmodSync(command, 0o755);
+      await run(command);
     } finally {
-      if (previous === undefined) {
-        Deno.env.delete("QUARTO_PYTHON");
-      } else {
-        Deno.env.set("QUARTO_PYTHON", previous);
-      }
-      await Deno.remove(command);
+      rmSync(directory, { recursive: true, force: true });
     }
-  },
-});
+  };
+}
 
-Deno.test("compiler processes stop at the configured timeout", async () => {
-  const quarto = {
-    console: { info: () => {} },
-  } as unknown as QuartoAPI;
+const compilerOptions = {
+  moduleUrl: import.meta.url,
+  source: "",
+  input: "page.qmd",
+  interactive: false,
+  globalEval: true,
+  externalEnv: true,
+  pyproject: "",
+};
 
+test(
+  "external environments use QUARTO_PYTHON",
+  { skip: windows },
+  withScript(
+    '#!/bin/sh\nprintf \'%s\\n\' \'{"kind":"static","outputs":[]}\'\n',
+    async (command) => {
+      const previous = process.env.QUARTO_PYTHON;
+      process.env.QUARTO_PYTHON = command;
+      try {
+        const result = await runMarimoCompiler(quarto, compilerOptions);
+        assertEquals(result, { kind: "static", outputs: [] });
+      } finally {
+        if (previous === undefined) delete process.env.QUARTO_PYTHON;
+        else process.env.QUARTO_PYTHON = previous;
+      }
+    },
+  ),
+);
+
+test(
+  "the compiler receives the document arguments and the bare-sql flag last",
+  { skip: windows },
+  withScript(
+    '#!/bin/sh\nprintf \'{"kind":"static","outputs":[],"argv":"%s"}\' "$*"\n',
+    async (command) => {
+      const previous = process.env.QUARTO_PYTHON;
+      process.env.QUARTO_PYTHON = command;
+      try {
+        const args = async (bareSql?: boolean) => {
+          const result = await runMarimoCompiler(quarto, {
+            ...compilerOptions,
+            bareSql,
+          });
+          return (result as unknown as { argv: string }).argv.split(" ").slice(1);
+        };
+        assertEquals(await args(), ["page.qmd", "static", "yes"]);
+        assertEquals(await args(true), ["page.qmd", "static", "yes", "yes"]);
+      } finally {
+        if (previous === undefined) delete process.env.QUARTO_PYTHON;
+        else process.env.QUARTO_PYTHON = previous;
+      }
+    },
+  ),
+);
+
+test("compiler processes stop at the configured timeout", async () => {
   await assertRejects(
     () =>
       executeProcess(
         quarto,
-        Deno.execPath(),
-        ["eval", "setInterval(() => {}, 1000)"],
+        process.execPath,
+        ["-e", "setInterval(() => {}, 1000)"],
         "",
         25,
       ),
@@ -62,23 +96,36 @@ Deno.test("compiler processes stop at the configured timeout", async () => {
   );
 });
 
-Deno.test({
-  name: "compiler processes run Python in UTF-8 mode and exchange UTF-8 bytes",
-  ignore: Deno.build.os === "windows",
-  async fn() {
-    const command = await Deno.makeTempFile();
-    try {
-      // Echo the UTF-8 controls and the raw stdin bytes back as a payload so
-      // the test observes exactly what a Python child would see.
-      await Deno.writeTextFile(
-        command,
-        '#!/bin/sh\ninput=$(cat)\nprintf \'{"env":"%s","stdin":"%s"}\' "$PYTHONUTF8:$PYTHONIOENCODING" "$input"\n',
-      );
-      await Deno.chmod(command, 0o755);
+test("a missing command rejects with the spawn error", async () => {
+  await assertRejects(
+    () => executeProcess(quarto, "quarto-marimo-no-such-command", [], ""),
+    Error,
+    "ENOENT",
+  );
+});
 
-      const quarto = {
-        console: { info: () => {} },
-      } as unknown as QuartoAPI;
+test("a failing process reports its stderr", async () => {
+  await assertRejects(
+    () =>
+      executeProcess(
+        quarto,
+        process.execPath,
+        ["-e", "console.error('boom'); process.exit(3)"],
+        "",
+      ),
+    Error,
+    "boom",
+  );
+});
+
+test(
+  "compiler processes run Python in UTF-8 mode and exchange UTF-8 bytes",
+  { skip: windows },
+  // Echo the UTF-8 controls and the raw stdin bytes back as a payload so the
+  // test observes exactly what a Python child would see.
+  withScript(
+    '#!/bin/sh\ninput=$(cat)\nprintf \'{"env":"%s","stdin":"%s"}\' "$PYTHONUTF8:$PYTHONIOENCODING" "$input"\n',
+    async (command) => {
       const output = await executeProcess(
         quarto,
         command,
@@ -90,8 +137,6 @@ Deno.test({
         env: "1:utf-8",
         stdin: "こんにちわ 日本語",
       });
-    } finally {
-      await Deno.remove(command);
-    }
-  },
-});
+    },
+  ),
+);

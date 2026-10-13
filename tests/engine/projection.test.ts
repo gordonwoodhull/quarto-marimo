@@ -1,4 +1,10 @@
-import { assertEquals, assertStringIncludes, assertThrows } from "@std/assert";
+import { test } from "node:test";
+
+import {
+  assertEquals,
+  assertStringIncludes,
+  assertThrows,
+} from "../assert.ts";
 
 import type {
   CompiledMarimoCell,
@@ -51,7 +57,7 @@ function page(): CompiledMarimoPage {
   };
 }
 
-Deno.test("projects one app carrier followed by cell references", () => {
+test("projects one app carrier followed by cell references", () => {
   const projected = projectInteractivePage(page());
   const first = decodePayload(projected[0]);
   const second = decodePayload(projected[1]);
@@ -64,7 +70,7 @@ Deno.test("projects one app carrier followed by cell references", () => {
   assertEquals("output" in second.cell, false);
 });
 
-Deno.test("preserves verbatim source and plain-text output", async () => {
+test("preserves verbatim source and plain-text output", async () => {
   const projected = await projectStaticPage(
     [
       {
@@ -82,7 +88,7 @@ Deno.test("preserves verbatim source and plain-text output", async () => {
   assertStringIncludes(projected[0], "```\n# Result\n*literal*\n```");
 });
 
-Deno.test("keeps multiline static errors in one blockquote", async () => {
+test("keeps multiline static errors in one blockquote", async () => {
   const [projected] = await projectStaticPage(
     [{
       type: "blockquote",
@@ -97,7 +103,7 @@ Deno.test("keeps multiline static errors in one blockquote", async () => {
   assertStringIncludes(projected, "> First line\n> Second line");
 });
 
-Deno.test("preserves Markdown characters in figure destinations", async () => {
+test("preserves Markdown characters in figure destinations", async () => {
   const [projected] = await projectStaticPage(
     [{
       type: "figure",
@@ -115,7 +121,7 @@ Deno.test("preserves Markdown characters in figure destinations", async () => {
   );
 });
 
-Deno.test("uses a raw HTML fence longer than its content", async () => {
+test("uses a raw HTML fence longer than its content", async () => {
   const [projected] = await projectStaticPage(
     [{
       type: "html",
@@ -133,7 +139,7 @@ Deno.test("uses a raw HTML fence longer than its content", async () => {
   );
 });
 
-Deno.test("rejects mismatched compiler and source cell counts", () => {
+test("rejects mismatched compiler and source cell counts", () => {
   assertThrows(
     () => validateProjectionCount(["one"], 2),
     Error,

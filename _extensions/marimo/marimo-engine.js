@@ -1,3 +1,6 @@
+import { mkdir, mkdtemp, rename, rm, readFile, stat, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+
 const extensionUrl = new URL(".", import.meta.url);
 const version = await extensionVersion();
 const releaseUrl = new URL(
@@ -30,8 +33,9 @@ const { default: engine } = await import(
 export default engine;
 
 async function extensionVersion() {
-  const config = await Deno.readTextFile(
+  const config = await readFile(
     new URL("_extension.yml", extensionUrl),
+    "utf-8",
   );
   const match = config.match(/^version:\s*["']?([^"'\s#]+)["']?\s*$/m);
   if (!match) throw new Error("marimo extension version is missing");
@@ -40,10 +44,10 @@ async function extensionVersion() {
 
 async function ensureArtifact(name, path) {
   try {
-    await Deno.stat(path);
+    await stat(path);
     return;
   } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) throw error;
+    if (error?.code !== "ENOENT") throw error;
   }
 
   const assetUrl = new URL(name, releaseUrl);
@@ -62,13 +66,14 @@ async function ensureArtifact(name, path) {
     );
   }
 
-  const directory = new URL(".", path);
-  await Deno.mkdir(directory, { recursive: true });
-  const temporaryPath = await Deno.makeTempFile({ dir: directory });
+  const directory = fileURLToPath(new URL(".", path));
+  await mkdir(directory, { recursive: true });
+  const temporaryDirectory = await mkdtemp(`${directory}.download-`);
+  const temporaryPath = `${temporaryDirectory}/artifact`;
   try {
-    await Deno.writeTextFile(temporaryPath, contents);
-    await Deno.rename(temporaryPath, path);
+    await writeFile(temporaryPath, contents, "utf-8");
+    await rename(temporaryPath, fileURLToPath(path));
   } finally {
-    await Deno.remove(temporaryPath).catch(() => undefined);
+    await rm(temporaryDirectory, { recursive: true, force: true });
   }
 }

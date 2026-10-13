@@ -5,6 +5,7 @@ from quarto_marimo.authoring import (
     execution_options_patch,
     extract_cell_config,
     normalize_markdown,
+    rewrite_bare_sql,
 )
 
 
@@ -98,3 +99,27 @@ def test_sql_class_fence_is_normalized_for_marimo_parser():
     markdown = '```{sql .marimo query="summary"}\nSELECT 1\n```'
 
     assert normalize_markdown(markdown).startswith('```sql {.marimo query="summary"}')
+
+
+def test_bare_sql_rewrite_is_gated_on_the_ownership_flag():
+    source = "```{sql}\nselect 1\n```\n"
+
+    assert rewrite_bare_sql(source, False) == source
+    assert rewrite_bare_sql(source, True) == "```sql {.marimo}\nselect 1\n```\n"
+    assert normalize_markdown(source) == source
+    assert normalize_markdown(source, True) == "```sql {.marimo}\nselect 1\n```\n"
+
+
+def test_bare_sql_rewrite_keeps_attributes_and_skips_marimo_forms():
+    assert (
+        rewrite_bare_sql("```{sql query=df}\nselect 1\n```", True)
+        == "```sql {.marimo query=df}\nselect 1\n```"
+    )
+    for untouched in (
+        "```{sql .marimo}\nselect 1\n```",
+        "```{sql.marimo}\nselect 1\n```",
+        "```{sqlfoo}\nselect 1\n```",
+        "```sql {.marimo}\nselect 1\n```",
+        "```{python}\n1\n```",
+    ):
+        assert rewrite_bare_sql(untouched, True) == untouched

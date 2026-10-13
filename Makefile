@@ -1,8 +1,6 @@
-.PHONY: build browser-build engine-build docs-prepare clean-python-cache test test-ts test-py lint preview render ci clean setup
+.PHONY: build docs-prepare clean-python-cache test test-ts test-py lint preview render ci clean setup
 
 VERSION := $(shell grep '^version:' _extensions/marimo/_extension.yml | sed 's/.*: *//')
-ENGINE_ARTIFACT := dist/marimo-engine-v$(VERSION).js
-ENGINE_CACHE := _extensions/marimo/marimo-engine-v$(VERSION).js
 
 QUARTO_VERSION ?= 1.9.37
 QUARTO_DIR := .quarto-dev/$(QUARTO_VERSION)
@@ -21,13 +19,11 @@ export PYTHONDONTWRITEBYTECODE := 1
 
 ifdef PIXI_PROJECT_ROOT
   PYTHON := python
-  DENO := deno
   RUFF := ruff
   MYPY := mypy
   PYTEST := pytest
 else
   PYTHON := uv run python
-  DENO := uv run deno
   RUFF := uv run ruff
   MYPY := uv tool run --with marimo mypy
   PYTEST := uv run --with pytest pytest
@@ -56,19 +52,14 @@ $(QUARTO_DIR)/bin/quarto:
 
 setup: $(QUARTO_DIR)/bin/quarto
 
-build:
-	rm -rf dist _extensions/marimo/assets
+# One esbuild run produces the engine, browser, and stylesheet artifacts.
+build: node_modules
 	rm -f _extensions/marimo/marimo-engine-v*.js
-	$(MAKE) browser-build
-	$(MAKE) engine-build
+	node scripts/build.mjs
 
-browser-build:
-	$(PYTHON) scripts/build_browser.py
-
-engine-build:
-	quarto call build-ts-extension src/engine/index.ts
-	mv dist/marimo-engine.js $(ENGINE_ARTIFACT)
-	cp $(ENGINE_ARTIFACT) $(ENGINE_CACHE)
+node_modules: package.json package-lock.json
+	npm ci
+	@touch node_modules
 
 docs-prepare: build
 	$(MAKE) clean-python-cache
@@ -81,18 +72,16 @@ clean-python-cache:
 
 test: test-ts test-py
 
-test-ts:
-	$(DENO) test --allow-read --allow-write --allow-env --allow-run tests
+test-ts: node_modules
+	npm test
 
 test-py:
 	$(PYTEST) tests/python -v
 
-lint:
+lint: node_modules
 	$(RUFF) check _extensions/marimo/python scripts tests/python
 	$(MYPY) _extensions/marimo/python
-	$(DENO) fmt --check deno.json _extensions/marimo/marimo-engine.js src tests
-	$(DENO) lint _extensions/marimo/marimo-engine.js src tests
-	$(DENO) check _extensions/marimo/marimo-engine.js src/engine/index.ts src/browser/index.ts
+	npx tsc -p .
 
 preview: docs-prepare
 	cd docs && quarto preview

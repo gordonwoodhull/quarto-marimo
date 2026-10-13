@@ -14,7 +14,7 @@ pixi run setup
 ```
 
 The setup task installs the repository's pinned Quarto release. Pixi provides
-Python, marimo, Deno, Pandoc, Ruff, mypy, and pytest.
+Python, marimo, Pandoc, Ruff, mypy, and pytest. Install Node 24 separately.
 
 ## Commands
 
@@ -31,7 +31,7 @@ Format Python and TypeScript source with:
 
 ```bash
 pixi run ruff format
-pixi run deno fmt deno.json src tests
+npx tsc -p .
 ```
 
 ## Repository structure

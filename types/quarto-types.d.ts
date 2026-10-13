@@ -286,8 +286,8 @@ export interface ExecuteOptions {
 	quiet?: boolean;
 	/** Whether execution is for preview server */
 	previewServer?: boolean;
-	/** List of languages handled by cell language handlers */
-	handledLanguages: string[];
+	/** List of languages handled by cell language handlers (Quarto 2: the leave-alone set) */
+	handledLanguages?: string[];
 	/** Project context */
 	project: EngineProjectContext;
 }
@@ -1534,6 +1534,15 @@ export interface ExecutionTarget {
  * Interface for execution engine discovery
  * Responsible for the static aspects of engine discovery (not requiring project context)
  */
+/**
+ * Kind-tagged language claim (Quarto 2). `interop` extends ownership of a
+ * language only when the engine is already present via a `primary` claim.
+ * Quarto 1 ignores object-valued claims.
+ */
+export interface LanguageClaim {
+	kind: "primary" | "interop" | "fallback";
+	priority?: number;
+}
 export interface ExecutionEngineDiscovery {
 	/**
 	 * Initialize the engine with the Quarto API (optional)
@@ -1578,7 +1587,7 @@ export interface ExecutionEngineDiscovery {
 	 * @param firstClass - Optional first class from code block attributes (e.g., "marimo" from {python .marimo})
 	 * @returns boolean for simple claim, or number for priority (higher wins, 0 = no claim, 1 = standard claim)
 	 */
-	claimsLanguage: (language: string, firstClass?: string) => boolean | number;
+	claimsLanguage: (language: string, firstClass?: string) => boolean | number | LanguageClaim | null;
 	/**
 	 * Whether this engine supports freezing
 	 */

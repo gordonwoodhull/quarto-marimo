@@ -6,14 +6,14 @@ browser mounting, generated assets, or release automation.
 
 ## Commands
 
-Use Pixi 0.68 or newer. Pixi provides Python, marimo, Deno, Pandoc, Ruff, mypy,
+Use Node 24 and Pixi 0.68 or newer. Pixi provides Python, marimo, Pandoc, Ruff, mypy,
 and pytest. The Makefile installs Quarto 1.9.37 under `.quarto-dev`.
 
 | Purpose | Command | Expected result |
 | --- | --- | --- |
 | Install | `pixi install --locked` | Create the locked development environment |
 | Set up Quarto | `pixi run setup` | Install the pinned Quarto release |
-| Lint and type-check | `pixi run lint` | Ruff, mypy, Deno formatting, linting, and type checks pass |
+| Lint and type-check | `pixi run lint` | Ruff, mypy, and TypeScript type checks pass |
 | Tests | `pixi run test` | TypeScript and Python tests pass |
 | Build | `pixi run build` | Create the versioned engine, browser, and CSS artifacts |
 | Render docs | `pixi run render` | Install the local extension and render the documentation site |
@@ -24,7 +24,7 @@ and pytest. The Makefile installs Quarto 1.9.37 under `.quarto-dev`.
 Run focused tests with:
 
 ```bash
-pixi run deno test --allow-read --allow-write --allow-env --allow-run tests/engine/process.test.ts
+node --test tests/engine/process.test.ts
 pixi run pytest tests/python/test_document.py -v
 ```
 
@@ -82,8 +82,8 @@ Quarto engine types, Pandoc output, or Quarto theme classes.
   `tests/browser`.
 - Shipped Python lives under `_extensions/marimo/python`. Python tests live in
   `tests/python` and use absolute `quarto_marimo` imports.
-- Format Python with `pixi run ruff format`. Format TypeScript with
-  `pixi run deno fmt deno.json src tests`.
+- Format Python with `pixi run ruff format`. TypeScript runs on Node 24 and
+  Quarto 1's Deno alike, so use `node:` built-ins, not the `Deno` namespace.
 - Test through engine discovery, subprocess payloads, protocol records,
   projected Markdown, registered elements, and rendered documents. Avoid
   assertions against generated formatting or private helper structure.

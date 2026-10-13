@@ -16,8 +16,26 @@ SQL_DOT_FENCE_REGEX = re.compile(
     re.MULTILINE,
 )
 
+# A bare `{sql ...}` fence (no `.marimo` marker) is rewritten to the same
+# qmd-form `sql {.marimo ...}` shape as SQL_DOT_FENCE_REGEX produces, but only
+# when Quarto 2's engine resolver assigned bare sql to marimo for this render
+# (the `bare_sql` flag the TypeScript engine threads in). Lookaheads:
+#   (?![\w.])         -- not `{sqlfoo}` and not `{sql.marimo}`
+#   (?![^}]*\.marimo)  -- not a fence that already carries `.marimo`
+BARE_SQL_FENCE_REGEX = re.compile(
+    r"^(\s*`{3,})\s*\{\s*sql(?![\w.])(?![^}]*\.marimo)(?P<attrs>[^}]*)\}\s*$",
+    re.MULTILINE,
+)
 
-def normalize_markdown(markdown: str) -> str:
+
+def rewrite_bare_sql(markdown: str, enabled: bool) -> str:
+    if not enabled:
+        return markdown
+    return BARE_SQL_FENCE_REGEX.sub(r"\1sql {.marimo\g<attrs>}", markdown)
+
+
+def normalize_markdown(markdown: str, bare_sql: bool = False) -> str:
+    markdown = rewrite_bare_sql(markdown, bare_sql)
     return SQL_DOT_FENCE_REGEX.sub(r"\1sql {.marimo\g<attrs>}", markdown)
 
 

@@ -1,8 +1,10 @@
-import { assert, assertEquals } from "@std/assert";
+import { test } from "node:test";
+
+import { assertEquals, assertOk } from "../assert.ts";
 import { parseHTML } from "linkedom";
 import type { MarimoIslandElement } from "@marimo-team/mdx-marimo/bridge/element";
 
-Deno.test("browser adapter mounts the host element and follows Quarto theme", async () => {
+test("browser adapter mounts the host element and follows Quarto theme", async () => {
   const { document, window } = parseHTML(
     "<html><head></head><body class='quarto-light'></body></html>",
   );
@@ -34,7 +36,7 @@ Deno.test("browser adapter mounts the host element and follows Quarto theme", as
   island.payload = staticPayload();
   await Promise.resolve();
 
-  assert(customElements.get("marimo-quarto-island"));
+  assertOk(customElements.get("marimo-quarto-island"));
   assertEquals(island.textContent?.trim(), "Static output");
   assertEquals(island.dataset.marimoTheme, "light");
 
