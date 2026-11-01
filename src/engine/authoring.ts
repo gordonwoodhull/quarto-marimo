@@ -47,23 +47,37 @@ export function isMarimoCell(cell: QuartoMdCell): boolean {
 
 /**
  * Whether `execute()` owns `cell` for this render. Every `.marimo`-tagged cell
- * is marimo's; a bare `{sql}` cell is marimo's only when Quarto 2 did not
- * leave sql alone for another engine. Quarto 2's `handledLanguages` is the
- * leave-alone set (built-in handled languages plus languages owned by other
- * engines), so marimo owns bare sql exactly when "sql" is absent from it.
- * Quarto 1 never sets `handledLanguages`, so bare sql is never marimo's there.
+ * is marimo's; a bare `{sql}` cell is marimo's only when Quarto 2 assigned sql
+ * to this engine.
+ *
+ * Quarto 2 sends `ownedLanguages`, the positive set of languages it assigned to
+ * marimo, and bare sql is marimo's exactly when that set includes "sql". When
+ * it is absent (an older Quarto 2), the leave-alone set `handledLanguages`
+ * applies instead: marimo owns bare sql when "sql" is absent from it. That
+ * complement also covers a language owned by nobody, which is why the positive
+ * set wins when present. Quarto 1 sends neither, so bare sql is never marimo's
+ * there.
  */
 export function cellOwnedByMarimo(
   cell: QuartoMdCell,
   handledLanguages: string[] | undefined,
+  ownedLanguages?: string[],
 ): boolean {
   if (isMarimoCell(cell)) return true;
-  if (handledLanguages === undefined) return false;
   if (typeof cell.cell_type !== "object" || !("language" in cell.cell_type)) {
     return false;
   }
-  return cell.cell_type.language === "sql" &&
-    !handledLanguages.includes("sql");
+  if (cell.cell_type.language !== "sql") return false;
+  return bareSqlOwned(handledLanguages, ownedLanguages);
+}
+
+/** Whether marimo runs bare `{sql}` cells; see {@link cellOwnedByMarimo}. */
+export function bareSqlOwned(
+  handledLanguages: string[] | undefined,
+  ownedLanguages: string[] | undefined,
+): boolean {
+  if (ownedLanguages !== undefined) return ownedLanguages.includes("sql");
+  return handledLanguages !== undefined && !handledLanguages.includes("sql");
 }
 
 /**

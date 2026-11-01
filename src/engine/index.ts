@@ -15,11 +15,13 @@ import type {
   LanguageClaim,
   MappedString,
   PandocIncludes,
+  QuartoMdCell,
   PostProcessOptions,
   QuartoAPI,
 } from "@quarto/types";
 
 import {
+  bareSqlOwned,
   cellOwnedByMarimo,
   containsMarimoFence,
   MARIMO_CELL_REGEX,
@@ -32,6 +34,13 @@ import {
   validateProjectionCount,
 } from "./projection.ts";
 import { runMarimoCompiler } from "./process.ts";
+import { buildMarimoRecord, type WireUnit } from "./records.ts";
+
+// Quarto 2 sends these beside Quarto 1's options; the SDK's types predate them.
+interface Quarto2ExecuteOptions {
+  ownedLanguages?: string[];
+  units?: WireUnit[];
+}
 
 let quarto: QuartoAPI;
 
@@ -158,10 +167,10 @@ const marimoEngineDiscovery: ExecutionEngineDiscovery = {
 
     execute: async (options: ExecuteOptions): Promise<ExecuteResult> => {
       const interactive = quarto.format.isHtmlCompatible(options.format);
-      // Quarto 2's `handledLanguages` is the leave-alone set, so marimo owns
-      // bare sql exactly when "sql" is absent from it. Quarto 1 omits it.
-      const bareSql = options.handledLanguages !== undefined &&
-        !options.handledLanguages.includes("sql");
+      const { ownedLanguages, units } = options as ExecuteOptions & Quarto2ExecuteOptions;
+      // Bare sql is marimo's when Quarto 2 assigned it (`ownedLanguages`), else when
+      // the leave-alone set `handledLanguages` does not hold it. Quarto 1 sends neither.
+      const bareSql = bareSqlOwned(options.handledLanguages, ownedLanguages);
       const execution = await quarto.console.withSpinner(
         { message: "Executing marimo cells..." },
         async () =>
@@ -182,9 +191,9 @@ const marimoEngineDiscovery: ExecutionEngineDiscovery = {
         false,
         bareSql ? MARIMO_CELL_REGEX_WITH_BARE_SQL : MARIMO_CELL_REGEX,
       );
-      const marimoCells = chunks.cells.filter((cell) =>
-        cellOwnedByMarimo(cell, options.handledLanguages)
-      );
+      const owned = (cell: QuartoMdCell) =>
+        cellOwnedByMarimo(cell, options.handledLanguages, ownedLanguages);
+      const marimoCells = chunks.cells.filter(owned);
       const projected = execution.kind === "page"
         ? projectInteractivePage(execution.page)
         : await projectStaticPage(execution.outputs, htmlToMarkdown);
@@ -193,7 +202,7 @@ const marimoEngineDiscovery: ExecutionEngineDiscovery = {
       let index = 0;
       const markdown = chunks.cells
         .map((cell) =>
-          cellOwnedByMarimo(cell, options.handledLanguages)
+          owned(cell)
             ? projected[index++] ?? ""
             : cell.sourceVerbatim.value
         )
@@ -205,12 +214,22 @@ const marimoEngineDiscovery: ExecutionEngineDiscovery = {
           writeBrowserHeader(extensionDir, options.tempDir),
         ];
       }
+      // Quarto 2's execution record: the rendered output of each cell, keyed by the
+      // unit ids it sent. Absent for Quarto 1 and an older Quarto 2 (no `units`).
+      const record = buildMarimoRecord({
+        cells: chunks.cells,
+        owned,
+        projected,
+        units,
+        format: options.format.identifier["target-format"] ?? "",
+      });
       return {
         engine: "marimo",
         markdown,
         supporting: [],
         filters: [],
         includes,
+        ...(record ?? {}),
       };
     },
 
