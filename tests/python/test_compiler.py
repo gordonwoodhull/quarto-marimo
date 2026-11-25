@@ -144,6 +144,26 @@ def test_error_false_rejects_failed_cell():
         compile_request(page_request)
 
 
+def test_error_output_omits_traceback():
+    # marimo 0.26 attaches a highlighted traceback to exception outputs in edit
+    # mode. It names the per-process temp file (marimo_<pid>/__marimo__cell_*.py)
+    # and local site-packages paths, so published output would differ on every
+    # run and leak the build machine's paths.
+    first = compile_request(request("raise ValueError('broken')"))
+    second = compile_request(request("raise ValueError('broken')"))
+
+    cell = first.cells[0]
+    assert cell.output is not None
+    assert cell.output.mimetype == "application/vnd.marimo+error"
+    errors = cell.output.data
+    assert isinstance(errors, list)
+    assert errors[0]["msg"] == "broken"
+    assert errors[0].get("traceback") is None
+    assert "__marimo__cell_" not in cell.html
+    assert "__marimo__cell_" not in cell.output.html
+    assert cell.html == second.cells[0].html
+
+
 def test_compiler_reports_effective_execution_and_unparsable_source():
     page_request = request("disabled source", "unparsable source")
     first, second = page_request.cells
